@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學員隨機練習系統</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
+        .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; text-align: left; transition: 0.3s; }
+        .option-btn:hover { background-color: #e9ecef; }
+        .correct { background-color: #d4edda !important; border-color: #c3e6cb; }
+        .wrong { background-color: #f8d7da !important; border-color: #f5c6cb; }
+        #feedback { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h2 id="question">載入中...</h2>
+    <div id="options"></div>
+    <div id="feedback"></div>
+    <hr>
+    <p>目前進度：<span id="progress">0</span> / <span id="total">0</span></p>
+    <button id="next-btn" style="display:none;" onclick="loadNextQuestion()">下一題</button>
+</div>
+
+<script>
+    // 這裡放入你的題庫
+    const questions = [
+        { q: "題目1：範例問題？", options: ["選項A", "選項B", "選項C", "選項D"], a: 0 },
+        { q: "題目2：另一個範例？", options: ["選項1", "選項2", "選項3", "選項4"], a: 2 }
+    ];
+
+    let currentIdx = 0;
+    let shuffledQuestions = [];
+
+    function initQuiz() {
+        shuffledQuestions = questions.sort(() => Math.random() - 0.5); // 簡單隨機化
+        document.getElementById('total').innerText = shuffledQuestions.length;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const qData = shuffledQuestions[currentIdx];
+        document.getElementById('question').innerText = qData.q;
+        document.getElementById('progress').innerText = currentIdx + 1;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').style.display = 'none';
+
+        qData.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, qData.a);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, correct) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.disabled = true);
+        
+        if(selected === correct) {
+            buttons[selected].classList.add('correct');
+            document.getElementById('feedback').innerText = "✅ 回答正確！";
+        } else {
+            buttons[selected].classList.add('wrong');
+            buttons[correct].classList.add('correct');
+            document.getElementById('feedback').innerText = "❌ 答錯了，請看正確答案。";
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function loadNextQuestion() {
+        currentIdx++;
+        if(currentIdx < shuffledQuestions.length) {
+            showQuestion();
+        } else {
+            alert("練習結束！做得好！");
+            location.reload();
+        }
+    }
+
+    initQuiz();
+</script>
+</body>
+</html>
